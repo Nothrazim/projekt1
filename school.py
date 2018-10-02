@@ -499,7 +499,6 @@ def game_start():
     print("With", AdventureScenesList[random_scene1].short_desc, "behind you, your journey continues.")
     print()
 
-    """
     random_scene2 = random.randrange(0, len(AdventureScenesList))
     while random_scene2 == random_scene1:
         random_scene2 = random.randrange(0, len(AdventureScenesList))
@@ -517,7 +516,7 @@ def game_start():
     AdventureScenesList[random_scene3].attempt(active_character)
     print("With", AdventureScenesList[random_scene3].short_desc, "behind you, your journey continues.")
     print()
-    """
+
     print("You reach the Tomb of Sucellus.")
     print(len(party_roster), "of the original", created_players, "have succeeded in reaching the Tomb.")
 
@@ -530,6 +529,3 @@ class_choices += ["Rogue", "Swashbuckler", "Hunter"]  # Split up only because th
 class_choices += ["Oracle", "Wizard", "Warlock"]
 
 menu_start()
-
-"""
-"""
