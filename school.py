@@ -1,6 +1,8 @@
 import random
+import mysql.connector
 
-print("This little game is a text-based adventure game, where you'll manage a\n"
+
+print("\nThis little game is a text-based adventure game, where you'll manage a\n"
       "handful of adventurers. These adventurers are all categorized by their\n"
       "class: Martial, Finesse, or Magic. In this adventure, your party will\n"
       "come across a number of obstacles that, for some, will be difficult -\n"
@@ -54,12 +56,12 @@ def menu_print_martial():
           "But be able to survive the march to far away dangerous locations.\n")
     print("\tBarbarian\n"
           "The Barbarian is a savage from tribes on the fringes of the known world.\n"
-          "Do not understimate him however -  despite the pelts and crude greatsword,\n"
+          "Do not underestimate him however -  despite the pelts and crude greatsword,\n"
           "the Barbarian is a seasoned veteran of harsh terrain and a dangerous life.\n")
     print("\tGuardian\n"
           "The Guardian is a master of fighting with sword and shield.\n"
-          "The Guardian is driven to defend her allies, who stand resolute behind"
-          "her shieldwall. Experienced and possessed of tremendous stamina,"
+          "The Guardian is driven to defend her allies, who stand resolute behind\n"
+          "her shieldwall. Experienced and possessed of tremendous stamina,\n"
           "the Guardian will make a good addition to any long venture.\n")
 
 
@@ -87,20 +89,29 @@ def menu_print_finesse():
 def menu_print_magic():
     print("\tOracle\n"
           "The Oracle is a mystical figure, who often speaks in riddles.\n"
-          "Despite occasional allusions to other-worldly guidance and \n"
+          "Despite occasional allusions to other-worldly guidance and\n"
           "an annoying tendency to proclaim 'so it was foretold' and the like,\n"
           "the Oracle is a formidable magician who can use ethereal power and\n"
-          "supernatural insights to devastating effect.\n")
+          "supernatural insights to incredible effect.\n")
     print("\tWizard\n"
-          "Wizards are mages who have trained their power since birth,\n")
+          "Wizards are mages who have trained their power since birth.\n"
+          "With decades of study, wizards become powerful arch-mages,\n"
+          "able to create tempests, banish demons, create illusions...\n"
+          "Unfortunately, your wizard isn't as skilled. But at least\n"
+          "he succeeded (and survived) his apprentice trials!\n")
     print("\tWarlock\n"
           "Warlocks gain their magical power through questionable, often heretical,\n"
-          "pacts.\n")
+          "means. But dabbling in forbidden arts has it's benefits. Maybe not dental\n"
+          "plans, but unnatural lifespans, secrets whispered by demons, cosmic\n"
+          "understanding and the ability to conjure pillars of fire that burns green\n"
+          "with the barely-understood potency of lower planes of existence.\n"
+          "Your warlock is a little bit ways off from that, but he knows how\n"
+          "to summon lesser demons to his bidding, at least.\n")
 
 
 class Player:
     def __init__(self, name, player_class):
-        self.name = name
+        self.name = name  # The name of every player character.
         self.player_class = player_class  # Player_class determines player_class_type.
         # Game is built around this second type, which determines if your selected player auto wins or fails
         # Whatever scene they attempt to overcome. IF they're not on the auto_fail or auto_succeed list,
@@ -190,6 +201,7 @@ class AdventureScene:
             print("Attempt function ended in else #2! Should not happen!")
 
 
+# Long desc is printed when first arriving at a scene (that is, when it is first called)
 basil_long_desc = "\nIn your search for the Tomb of Sucellus, your party travels over the steep hills," \
                      "\nnarrow canyons and mountainous terrain near the foothills of Mount Arkos." \
                      "\nIt is here, overlooking a narrow ravine, that your party simply must" \
@@ -200,6 +212,7 @@ basil_long_desc = "\nIn your search for the Tomb of Sucellus, your party travels
                      "\nand fearful magi whisper of how the beast supposedly favours their flesh." \
                      "\nOne amongst your party must descend into the valley and face the beast." \
                      "\n"
+# Auto fail print is shown when player selects a class type that auto fails in the scene
 basil_auto_fail_print = "Your mage hesitantly descends into the valley, and moves to face the beast." \
                         "\nYour mage begins to conjure a spell to strike at the creature" \
                         "\nbut with sudden vigour it surges forth, as the echo of it's hungry" \
@@ -208,6 +221,7 @@ basil_auto_fail_print = "Your mage hesitantly descends into the valley, and move
                         "\nignores it completely. Your party is helpless to watch as the beast" \
                         "\nrapidly closes the distance and consumes your poor mage. At least" \
                         "\nthe hunger of the beast appears to have been satiated."
+# Fail print is shown when player selects a class type that might fail the scene - and does
 basil_fail_print = "Your chosen member moves forth to attack the beast, and begins an" \
                    "\nintricate side-stepping pattern, avoiding the blows of the great" \
                    "\nlumbering beast. A thrust, a stab, but the hide of the beast resists." \
@@ -217,6 +231,8 @@ basil_fail_print = "Your chosen member moves forth to attack the beast, and begi
                    "\nthe weapon clatters to the ground uselessly, and the basilisk descends" \
                    "\nto partake in it's favourite meal. At least the hunger of the" \
                    "\nbeast appears to be satiated..."
+# Success print is shown when player selects any of the other two class types - either
+# auto succeeding, or rollin' the dice and succeeding with luck.
 basil_success_print = "Your chosen member moves forth to attack the beast, and begins an" \
                       "\nintricate side-stepping pattern, avoiding the blows of the great" \
                       "\nlumbering beast. A thrust, a stab, and the beast begins to bleed." \
@@ -226,6 +242,8 @@ basil_success_print = "Your chosen member moves forth to attack the beast, and b
                       "\nSteel meets flesh, and the beast rolls over gurgling blood as" \
                       "\nthe weapon pierces the flesh in it's mouth, dying slowly." \
                       "\nA harrowing victory, but a victory nonetheless."
+# Special success is a dictionary that shows special unique prints instead of the regular
+# success prints, Not all classes have unique success prints.
 basil_special_success = {"Barbarian": "With a mighty roar your barbarian leaps off the cliff"
                                       "\nand slams into the basilisk, the blade cutting deep."
                                       "\nIt thrashes, it heaves, but the beast is undone. ",
@@ -245,23 +263,55 @@ basil_special_success = {"Barbarian": "With a mighty roar your barbarian leaps o
                                    "\nstriking the beast in the eye, blinding it utterly."
                                    "\nA few calmly aimed sister-arrows finish the beast,"
                                    "\nall without a hint of danger to the expedition."}
+# Adventure scene is created w. variables above
 basilisk_below = AdventureScene("the Basilisk Below", basil_long_desc, "magic", "martial", basil_auto_fail_print,
                                 basil_fail_print, basil_success_print, basil_special_success)
 
 
+# This repeats for each scene
 forest_long_desc = "\nYou stand upon the threshold of the Forest of Mist." \
                    "\nThe forest is said to be infinite in size, and contain a thousand paths." \
                    "\nOnly those of exceptional cleverness could hope to navigate the forest," \
                    "\nFor it is said to hold a malevolent intelligence." \
                    "\nWho dares guide the party through?" \
                    "\n"
-forest_auto_fail_print = "Your martial dude sucks at navigation."
-forest_fail_print = "You get through the forest, but you lose the leader."
+forest_auto_fail_print = "\nThough skilled in the arts of war, your chosen leader" \
+                         "\nIsn't the most reliable when it comes to navigation" \
+                         "\nthrough a haunted forest. The party is lost in a mist..." \
+                         "\n\nThe party at last emerges, delayed and scattered, but intact -" \
+                         "\nexcept for your chosen navigator, who is never seen again."
+forest_fail_print = "\nThough skilled in the art of subtle movement and dexterous," \
+                    "\nyour chosen leader, it turns out, isn't clever enough to" \
+                    "\nnavigate a haunted forest. Your party is lost in a fog..." \
+                    "\nThe group at last emerges, delayed and scattered, but intact -" \
+                    "\nexcept for your chosen navigator, who is never seen again."
 forest_success_print = "You navigate through the forest."
-forest_special_success = {"Hunter": "Yeah, i know woods.",
-                          "Oracle": "Trust the senses, the oracle says. Okay.",
-                          "Wizard": "Yes, just like my books said.",
-                          "Warlock": "KLAATU, BAATU, FOREST DEMON INVOCATION"}
+forest_special_success = {"Hunter": "\nYour hunter scoffs. A forest."
+                                    "\nThis is standard fare. Ordering a hard march,"
+                                    "\nYour hunter stays ahead a few paces at all times."
+                                    "\nThough not the most congenial leader,"
+                                    "\nyour hunter leads the party through in record time.",
+                          "Oracle": "\nYour Oracle leads like a drunken reveler, stumbling"
+                                    "\nthrough the forest in what seems like random"
+                                    "\ndirections. Your party fears for their life,"
+                                    "\nbut when the fogs clear your finds themselves"
+                                    "\non the other side, safe and sound.",
+                          "Wizard": "\nYour wizard takes a disturbingly long amount"
+                                    "\nof time deciding on a direction every time the"
+                                    "\nwoodlands offer diverging paths or the mists"
+                                    "\nclear, but slowly, methodically, your party"
+                                    "\nmoves forward. It may have taken half a day"
+                                    "\nlonger than it should, but you're through,"
+                                    "\nat least - and with every body accounted for.",
+                          "Warlock": "\nYour warlock, when designated leader,"
+                                     "\nimmediately orders a sacrifice. A pack animal,"
+                                     "\nnot a party member, he clarifies. Away from"
+                                     "\nthe group, he invokes the power of his patron"
+                                     "\nfrom spheres away from this earth. Darkness"
+                                     "\nlankets the area, and torches are snuffed out."
+                                     "\nWhen light returns, a trail of blood leads"
+                                     "\ninto the forest. Your warlock confidently"
+                                     "\nleads the party to follow it to the other side."}
 forest_of_mist = AdventureScene("the Forest of Mists", forest_long_desc, "martial", "magic", forest_auto_fail_print,
                                 forest_fail_print, forest_success_print, forest_special_success)
 
@@ -269,43 +319,134 @@ forest_of_mist = AdventureScene("the Forest of Mists", forest_long_desc, "martia
 bridge_long_desc = "\nYou reach the Bridge of Doom." \
                    "\nThe ancient bridgekeeper is said to possess wisdom beyond ages," \
                    "\nAnd can separate any lie from truth. Those who lie to him cannot cross." \
-                   "\nWho will parley with him for passage?" \
-                   "\n"
-bridge_auto_fail_print = "'What is your favorite colour?'\n'Red, no blue, no- AAAIIGGHH'."
-bridge_fail_print = "What is the air speed velocity of a laden swallow? Don't know? Eat yo soul."
-bridge_success_print = "The bridgekeeper lets you pass for a bribe."
-bridge_special_success = {"Rogue": "I bribe the bridgkeeper.",
-                          "Wizard": "Your wizard knows how to riddle diddle.",
-                          "Warlock": "Is that Tim? Tim, from college? Hey buddy!"
-                                     "Guys, go on ahead, i know Tim, we go way back!\n"}
+                   "\nWho will parley with him for passage?\n"
+bridge_auto_fail_print = "\nYour hero steps forth. The bridgekeeper calls out:" \
+                         "\n\"WHAT... is your favorite colour?\"" \
+                         "\n\"Red- no wait, oran- AAIIIIiiiii.....\"" \
+                         "\nWith a horrific scream, an invisible force" \
+                         "\nHurls your hero over the side of the bridge to disappear" \
+                         "\ninto the fog below. The bridgekeeper cackles, and with a 'puf'" \
+                         "\ninto the thin air. Warily, your party crosses the bridge."
+bridge_fail_print = "\nYour hero steps forth. The bridgekeeper calls out:" \
+                    "\n\"WHAT... is your favorite colour?\"" \
+                    "\n\"Red- no wait, oran- AAIIIIiiiii.....\"" \
+                    "\nWith a horrific scream, an invisible force" \
+                    "\nHurls your hero over the side of the bridge to disappear" \
+                    "\ninto the fog below. The bridgekeeper cackles, and with a 'puf'" \
+                    "\ninto the thin air. Warily, your party crosses the bridge."
+bridge_success_print = "\nYour hero steps forth. The bridgekeeper calls out:" \
+                       "\n\"WHAT... is the air speed velocity of an unladen swallow?\"" \
+                       "\n\"What do you mean, 'an unladen swallow'? An african," \
+                       "\n\"or a european swallow?\" Your hero retorts." \
+                       "\n\"I.. i... I don't know- AAAAIIIiiiiii......" \
+                       "\nWith a horrific scream, an invisible force" \
+                       "\nHurls the bridgekeeper over the side of the bridge" \
+                       "\ninto the fog below. Relieved, your party crosses the bridge."
+bridge_special_success = {"Rogue": "\nYour rogue moves up to talk to the bridgekeeper,"
+                                   "\nspeaking with him in low tones. They seem to argue,"
+                                   "\nbefore your rogue produces a small jingling pouch"
+                                   "\nfrom a pocket somewhere in her armor."
+                                   "\nThe bridgekeeper weighs it in his hand, then"
+                                   "\ndisappears in a puff of smoke."
+                                   "\nRelieved, your party crosses, only later"
+                                   "\ndiscovering that everyone is light of a few coins.",
+                          "Warlock": "Your warlock rushes forward.\"Hey, Tim - Tim!\""
+                                     "The two shake hands, obviously friends from some"
+                                     "time past, and begin discussing the merits"
+                                     "and difficulties of demonic summoning."
+                                     "Waving your party to cross while he continues"
+                                     "speaking to the bridgekeeper, he catches up"
+                                     "to the party a few minutes later on the other side."}
 bridge_of_doom = AdventureScene("the Bridge of Doom", bridge_long_desc, "martial", "magic", bridge_auto_fail_print,
                                 bridge_fail_print, bridge_success_print, bridge_special_success)
 
 
-gate_long_desc = "" \
-                 "\nYou reach the Gate of Adamant." \
-                 "\nIt is a gate. It looks strong." \
-                 "\nWho will try to get through it?" \
-                 "\n"
-gate_auto_fail_print = "Your finesse guy is zapped by the gate."
-gate_fail_print = "The gate zaps your martial man, but hey, it burnt out and opened."
-gate_success_print = "Your martial or magic man opened the gate."
-gate_special_success = {"Hunter": "Yeah, i know woods.",
-                        "Oracle": "Trust the senses, the oracle says. Okay.",
-                        "Wizard": "Yes, just like my books said.",
-                        "Warlock": "KLAATU, BAATU, FOREST DEMON INVOCATION"}
-gate_of_adamant = AdventureScene("the Gate of Adamant", gate_long_desc, "finesse", "magic", gate_auto_fail_print,
-                                 gate_fail_print, gate_success_print, gate_special_success)
+gate_long_desc = "\nYou reach the Gate of Adamant." \
+                 "\nThe gate bars the passage in a narrow valley, the only" \
+                 "\npassage for miles around. The gate is a silvery sheen," \
+                 "\nand the fifteen-foot tall double doors have no handles," \
+                 "\nno keyhole, no features... except for a single purple" \
+                 "\nrune that glows dimly in the very center." \
+                 "\nWho will try to get your party through it?\n"
+gate_auto_fail_print = "\nCracking their knuckles, your leader steps forth to try" \
+                       "\nto open the gate. With no lock to pick, no mechanism to" \
+                       "\nseemingly trigger, your hero elects to simply try to push" \
+                       "\nit open. That, it turns out, was a bad idea." \
+                       "\nLightning discharges from the purple seal, sending a thunderbolt" \
+                       "\ndown on the poor chap. The purple symbol fizzles," \
+                       "\nsparks fly, and with a thunderclap it is gone." \
+                       "\nThe survivors, pushing the charred body to the side," \
+                       "\neasily open the gate."
+gate_fail_print = "\nCracking their knuckles, your leader steps forth to try" \
+                  "\nto open the gate. Your hero elects to simply test it first," \
+                  "\nsmacking it with the blade. That, it turns out, was a bad idea." \
+                  "\nLightning discharges from the purple seal, sending a thunderbolt" \
+                  "\ndown on the poor chap. The purple symbol fizzles," \
+                  "\nsparks fly, and with a thunderclap it is gone." \
+                  "\nThe survivors, pushing the charred body to the side," \
+                  "\neasily open the gate."
+gate_success_print = "\nYour leader steps forth, cracking knuckles to test the gate." \
+                     "\nNot seeing any obvious means of entry, your clever hero decides" \
+                     "\nto pick up a rock and throw it at the sigil. This, it turns out," \
+                     "\nwas actually a good idea. Lightning discharges from the seal," \
+                     "\ncoursing through the rock and partially melting it." \
+                     "\nThe purple symbol fizzles, sparks fly, and with a thunderclap" \
+                     "\nit is gone. Your leader leverages the gate open and" \
+                     "\nyour party continues into the valley beyond."
+gate_special_success = {"Hunter": "\nYour hunter shrugs, and doing what he does best,"
+                                  "\nfires an arrow at the door. This, it turns out,"
+                                  "\nwas actually a good idea. Lightning discharges from the seal,"
+                                  "\ncoursing through the rock and partially melting it."
+                                  "\nThe purple symbol fizzles, sparks fly, and with a thunderclap"
+                                  "\nit is gone. Your hunter pushes the gate open,"
+                                  "\nand your party continues."}
+sealed_gate = AdventureScene("the Sealed Gate", gate_long_desc, "finesse", "magic", gate_auto_fail_print,
+                             gate_fail_print, gate_success_print, gate_special_success)
 
-fen_long_desc = "" \
-                "\nYou reach the Fen of Ghosts." \
+fen_long_desc = "\nYou reach the Fen of Ghosts." \
                 "\nThe swampy morass is said to hold ten thousand dead from a battle eons ago." \
+                "\nFearful wanderers whisper of ghosts that haunt it - and that" \
+                "\nany who attempts to cross draws their ire. They will surely" \
+                "\nattempt to trick your party down into the boggy waters." \
                 "\nWho will guide the party through the haunted mire?" \
                 "\n"
-fen_auto_fail_print = "Your martial guy does not know how to cross a fen."
-fen_fail_print = "You lost your mage. But hey, you got through."
+fen_auto_fail_print = "\nYour leader guides the party forward, avoiding the sinking" \
+                      "\ndepths of the mire. But though fearless and skilled with" \
+                      "\nblade, your leader isn't the best.. at resisting temptation." \
+                      "\nIn a moment of fatigue, your leader spots something - a person," \
+                      "\nstruggling in the water. A fair girl, crying out for help." \
+                      "\nImmediately diving to aid her, despite the outcries from the" \
+                      "\nthe rest of the party, your leader disappears beneath the waves." \
+                      "\nOnly a burst of bubbles and blood surfaces." \
+                      "\nStill, your party continues, and hours later, exhausted," \
+                      "\nreach the far side, safe from the ghosts of the fen."
+fen_fail_print = "\nYou begin making your way through the marshy and haunted fen," \
+                 "\nMagic leading the way to shield you against the horrors that may" \
+                 "\nlurk beneath. Then - there! - your party spots it: a young girl," \
+                 "\ncrying out for help, struggling not to sink into the depths." \
+                 "\nImmediately, your leader unleashes a bolt of eldritch energy" \
+                 "\nthat soars against the girl. With a flash of light, it is revealed -" \
+                 "\na rotting horror, that screams and disappears beneath the waves!" \
+                 "\nYour party begins moving forward again before a shout comes to your" \
+                 "\attention - in the chaos, it appears one of your pack animals is now" \
+                 "\ntrapped, beginning to sink! Your leader hastes forward to aid the struggling" \
+                 "\nbeast... and that is when your party discovers, it too was a ruse." \
+                 "\nit was a mere illusion. With barely any time to shout in alarm, your" \
+                 "\nleader is dragged beneath the waves, never to emerge." \
+                 "\nFortunately, the spirits of the bog seem pleased with this offering," \
+                 "\nfor the rest of the party escapes the haunted fen without further incidents."
 fen_success_print = "Your dextrous or magical man got you through."
-fen_special_success = {"Hunter": "Yeah, i know bogs.",
+fen_special_success = {"Hunter": "\nYour hunter confidently leads your group through"
+                                 "\nthe swampy mire. Though he is only truly at home"
+                                 "\n in forests, he says, this is close enough."
+                                 "\nThen, the alluring siren call sings out. A young girl,"
+                                 "\ncrying out for help, struggling in the mire. Your"
+                                 "\nparty pauses, uncertain if this is a mirage or real,"
+                                 "\nbut your hunter calmly draws an arrow from his quiver,"
+                                 "\ntakes aim, and fires. The cry turns to a raging howl,"
+                                 "\nan eldrich scream, and the once-girl, now a rotting corpse,"
+                                 "\nsinks back into the mire. The party continues, escaping"
+                                 "\nthe fen without any more obstacles.",
                        "Oracle": "Trust the senses, the oracle says. Okay.",
                        "Wizard": "Yes, just like my books said.",
                        "Warlock": "KLAATU, BAATU, FOREST DEMON INVOCATION"}
@@ -317,6 +458,7 @@ lake_long_desc = "\nYou come to the Lake of Caerbannog." \
                  "\nThe ground around the lake is soft ankle-high grass, and" \
                  "\nyou see no creatures around save for a small rabbit." \
                  "\nBy the lake's shore, there is a small boat moored." \
+                 "\nIt looks placid enough... but tales tell of sea serpents beneath." \
                  "\nWho will guide the party across the lake?" \
                  "\n"
 lake_auto_fail_print = "Your fighter is wholly unprepared to fight the seamonsters."
@@ -353,14 +495,15 @@ cockatrice = AdventureScene("the Rampaging Cockatrice", trice_long_desc, "finess
                             trice_fail_print, trice_success_print, trice_special_success)
 
 
-def choose_active_character(char_list):
-    player_list = 0
-    print("\n" + "characters")
+def choose_active_character(char_list):  # Function for user to select which character
+    # That should attempt to succeed in the scene
+    player_list = 0  # Iteration for list of players
+    print("\t" + "Characters")
     while True:
         try:
-            for char in char_list:
+            for char in char_list:  # Prints a list of all characters (still alive)
                 print(str(player_list+1) + ".", char.name + ", the", char.player_class)
-                player_list += 1
+                player_list += 1  # Increment counter, so you get a neat numbering
             chosen_character = int(input("Choose your dood: ")) - 1
             if chosen_character >= len(char_list):  # If user tries to input number out of index, force a new input
                 print("That character doesn't exist. Try a lower number.\n")
@@ -373,12 +516,12 @@ def choose_active_character(char_list):
         except ValueError or TypeError:  # Except to handle value or type errors
             print("That's not a number. Try again.\n")
             continue
-    active_character = char_list[chosen_character]
+    active_character = char_list[chosen_character]  # active_character becomes a
+    # Player type variable - the character the player chose.
     return active_character
 
 
 def game_start():
-    print("bla bla bla, intro text")
 
     party_number = 0  # Total party number
     created_players = 0  # Variable to loop through number of player characters created
@@ -436,7 +579,7 @@ def game_start():
                     print()
                     continue
                 elif new_player_class < 0:  # If user inputs number too low
-                    print("Below 0. Try again.")
+                    print("Try a higher number..")
                     print()
                     continue
                 else:  # If the user (finally) inputs a correct number, loop breaks (for current player) and moves on
@@ -486,18 +629,16 @@ def game_start():
     print(party_name, "set out from the capitol. After a journey of several days,"
                       "they come before their first obstacle.")
 
-    print(forest_long_desc)
-    active_character = choose_active_character(party_roster)
-    forest_of_mist.attempt(active_character)
-    print("With", forest_of_mist.short_desc, "behind you, your journey continues.")
-    print()
-
     random_scene1 = random.randrange(0, len(AdventureScenesList))
     print(AdventureScenesList[random_scene1].long_desc)
     active_character = choose_active_character(party_roster)
     AdventureScenesList[random_scene1].attempt(active_character)
     print("With", AdventureScenesList[random_scene1].short_desc, "behind you, your journey continues.")
     print()
+
+################################
+# fix if party_roster <= 0: ded#
+################################
 
     random_scene2 = random.randrange(0, len(AdventureScenesList))
     while random_scene2 == random_scene1:
@@ -521,11 +662,11 @@ def game_start():
     print(len(party_roster), "of the original", created_players, "have succeeded in reaching the Tomb.")
 
 
-AdventureScenesList = [basilisk_below, forest_of_mist, bridge_of_doom]
-# AdventureScenesList += [gate_of_adamant, fen_of_ghosts, lake_of_caerbannog, cockatrice]
+AdventureScenesList = [basilisk_below, forest_of_mist, bridge_of_doom, sealed_gate,
+                       fen_of_ghosts, lake_of_caerbannog, cockatrice]
 
-class_choices = ["Blademaster", "Guardian", "Barbarian"]
-class_choices += ["Rogue", "Swashbuckler", "Hunter"]  # Split up only because the list is so long
-class_choices += ["Oracle", "Wizard", "Warlock"]
+class_choices = ["Blademaster", "Guardian", "Barbarian",
+                 "Rogue", "Swashbuckler", "Hunter",
+                 "Oracle", "Wizard", "Warlock"]
 
 menu_start()
