@@ -1,7 +1,8 @@
 import random
 
 # Worth mentioning first is the length of the different prints. Due to the small size of my laptop,
-# the horizontal width of all outputs is pretty small, and depending on resolution, sentances may appear to be cut in half.
+# the horizontal width of all outputs is pretty small,
+# and depending on resolution, sentances may appear to be cut in half.
 # This was unfortunately unavoidable, but it should not affect the experience except for minor annoyance.
 
 party_name = ""
@@ -122,39 +123,30 @@ class Player:
         # Whatever scene they attempt to overcome. If they're not on the auto_fail or auto_succeed list,
         # It's a 50/50 to succeed.
         if self.player_class is "Blademaster":
-            print("martial:", self.player_class)
             self.player_class_type = "martial"
 
         elif self.player_class is "Guardian":
-            print("martial:", self.player_class)
             self.player_class_type = "martial"
 
         elif self.player_class is "Barbarian":
-            print("martial:", self.player_class)
             self.player_class_type = "martial"
 
         elif self.player_class is "Rogue":
-            print("finesse:", self.player_class)
             self.player_class_type = "finesse"
 
         elif self.player_class is "Swashbuckler":
-            print("finesse:", self.player_class)
             self.player_class_type = "finesse"
 
         elif self.player_class is "Hunter":
-            print("finesse:", self.player_class)
             self.player_class_type = "finesse"
 
         elif self.player_class is "Oracle":
-            print("magic:", self.player_class)
             self.player_class_type = "magic"
 
         elif self.player_class is "Wizard":
-            print("magic:", self.player_class)
             self.player_class_type = "magic"
 
         elif self.player_class is "Warlock":
-            print("magic:", self.player_class)
             self.player_class_type = "magic"
 
 
@@ -174,14 +166,14 @@ class AdventureScene:
         print(active_character.name, "the", active_character.player_class, "steps forth.\n")
         if self.auto_fail == active_character.player_class_type:  # If your class type auto fails.. well, tough luck.
             print(self.auto_fail_print)
-            print(active_character.name, "has died!")
+            print("\n" + active_character.name, "has died!")
             party_roster.remove(active_character)  # Removes dead player from the party roster.
         elif self.auto_succeed == active_character.player_class_type:
             special_success = False  # Var to check if player gets a unique print based on class instead of generic
             for special_success_class in self.special_success:
-                if special_success_class == active_character.player_class: 
+                if special_success_class == active_character.player_class:
                     # If there is a unique print for active player's class, play that instead
-                    print(self.special_success[special_success_class]) 
+                    print(self.special_success[special_success_class])
                     special_success = True
             if special_success is False:  # If the player didn't get a unique print, print generic success
                 print(self.success_print)
@@ -200,7 +192,7 @@ class AdventureScene:
 
                 elif randomized_outcome < 50:  # Bad luck kills you.
                     print(self.fail_print)
-                    print(active_character.name, "has died!")
+                    print("\n" + active_character.name, "has died!")
                     party_roster.remove(active_character)  # Removes dead player from the party roster.
             else:
                 print("Attempt function ended in else #1! Should not happen!")
@@ -652,7 +644,7 @@ def choose_active_character(char_list):  # Function for user to select which cha
             for char in char_list:  # Prints a list of all characters (still alive)
                 print(str(player_list+1) + ".", char.name + ", the", char.player_class)
                 player_list += 1  # Increment counter, so you get a neat numbering
-            chosen_character = int(input("Choose your dood: ")) - 1
+            chosen_character = int(input("Choose who will attempt the challenge: ")) - 1
             if chosen_character >= len(char_list):  # If user tries to input number out of index, force a new input
                 print("That character doesn't exist. Try a lower number.\n")
                 continue
@@ -672,11 +664,11 @@ def choose_active_character(char_list):  # Function for user to select which cha
 def check_player_number():  # Simple function called after every resolved attempt checking if the player's group dies.
     global party_survived
     if len(party_roster) < 1:
-        print("Your party has succumbed to the dangers in the wilds."
-              "The lands of Erebus are not for the feint of heart,"
-              "or weak of will or strength. Or perhaps Fate or Lady Luck"
-              "merely decreed that today was not your day, for here"
-              "ends the tale of", party_name + ".")
+        print("\nYour party has succumbed to the dangers in the wilds."
+              "\nThe lands of Erebus are not for the feint of heart,"
+              "\nor weak of will or strength. Or perhaps Fate or Lady Luck"
+              "\nmerely decreed that today was not your day, for here"
+              "\nends the tale of", party_name + ".")
         party_survived = False
     else:
         party_survived = True
@@ -709,7 +701,12 @@ def game_start():
 
     print("Very well, then.\n" + str(party_number), "members will set forth then on the quest.")
     global party_name
-    party_name = input("What shall be the name of this band of fellows?\n").capitalize()  # Any good party needs a name!
+    while True:
+        party_name = input("What shall be the name of this band of fellows?\n").capitalize()  # Any good party needs a name!
+        if not party_name:
+            print("Try writing a name.")
+        else:
+            break
     global party_roster
     party_roster = []
     # party_roster is the list of those in the party. The list will contain each instance of a Player class.
@@ -798,7 +795,7 @@ def game_start():
 
     check_player_number()
     if party_survived is True:
-        print("With", AdventureScenesList[random_scene1].short_desc, "behind you, your journey continues.")
+        print("\nWith", AdventureScenesList[random_scene1].short_desc, "behind you, your journey continues.")
         print()
 
         # Scene number 2. The same happens as above.
@@ -811,7 +808,7 @@ def game_start():
 
         check_player_number()
         if party_survived is True:
-            print("With", AdventureScenesList[random_scene2].short_desc, "behind you, your journey continues.")
+            print("\nWith", AdventureScenesList[random_scene2].short_desc, "behind you, your journey continues.")
             print()
 
             random_scene3 = random.randrange(0, len(AdventureScenesList))
@@ -824,7 +821,7 @@ def game_start():
 
             check_player_number()
             if party_survived is True:
-                print("With", AdventureScenesList[random_scene3].short_desc, "behind you, your journey continues.")
+                print("\nWith", AdventureScenesList[random_scene3].short_desc, "behind you, your journey continues.")
                 print()
 
                 print("At long last, your party finally reach the Tomb of Sucellus.",
